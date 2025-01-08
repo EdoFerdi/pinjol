@@ -93,6 +93,22 @@ public function destroyPembayaran($id)
         return response()->json($response, 200);
     }
 
+    public function getPembayaranById($id)
+    {
+    // Cari pembayaran berdasarkan ID
+    $pembayaran = Pembayaran::find($id);
+
+    // Jika tidak ditemukan, kembalikan respon error
+    if (!$pembayaran) {
+        return response()->json([
+            'message' => 'Pembayaran tidak ditemukan',
+        ], 404);
+    }
+
+    // Kembalikan data Pembayaran
+    return response()->json($pembayaran, 200);
+}
+
     public function storePembayaran(Request $request)
     {
         // validasi input
