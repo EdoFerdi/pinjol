@@ -26,6 +26,6 @@ Route::put('pinjaman/{id}', [PinjamanController::class, 'updatePinjaman']);
 Route::get('pembayaran', [PembayaranController::class, 'getPembayaran']);
 Route::post('pembayaran', [PembayaranController::class, 'storePembayaran']);
 Route::delete('pembayaran/{id}', [PembayaranController::class, 'destroyPembayaran']);
-Route::get('pembayaran/{id}', [PembayaranController::class, 'getPinjamanById']);
+Route::get('pembayaran/{id}', [PembayaranController::class, 'getPembayaranById']);
 Route::put('pembayaran/{id}', [PembayaranController::class, 'updatePembayaran']); 
 
