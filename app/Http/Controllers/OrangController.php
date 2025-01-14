@@ -36,11 +36,7 @@ class OrangController extends Controller
      */
     public function show(Orang $orang)
     {
-        $orang = Orang::find($orang);
-        $data['success'] = true;
-        $data['message'] = "Detail data Orang";
-        $data['result'] = $orang;
-        return response()->json($data, 200);
+        
     }
 
     /**
