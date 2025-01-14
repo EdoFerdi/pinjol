@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrangController;
 use App\Http\Controllers\PinjamanController;
 use App\Http\Controllers\PembayaranController;
@@ -29,3 +30,6 @@ Route::delete('pembayaran/{id}', [PembayaranController::class, 'destroyPembayara
 Route::get('pembayaran/{id}', [PembayaranController::class, 'getPembayaranById']);
 Route::put('pembayaran/{id}', [PembayaranController::class, 'updatePembayaran']); 
 
+Route::post('login', [AuthController::class, 'login']);
+
+Route::post('register', [AuthController::class, 'register']);

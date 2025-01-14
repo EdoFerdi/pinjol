@@ -113,10 +113,11 @@ public function destroyPembayaran($id)
     {
         // validasi input
         $input = $request->validate([
+            "pinjaman_id"   => "required",
             "tgl_bayar"     => "required",
             "jumlah_bayar"  => "required",
-            "sisa_bayar"    => "required",
-            "pinjaman_id"   => "required"
+            "sisa_bayar"    => "required"
+            
         ]);
 
         // simpan
