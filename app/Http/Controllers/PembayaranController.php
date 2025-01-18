@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Pinjaman;
 use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 
@@ -111,26 +111,31 @@ public function destroyPembayaran($id)
 
     public function storePembayaran(Request $request)
     {
-        // validasi input
-        $input = $request->validate([
-            "pinjaman_id"   => "required",
-            "tgl_bayar"     => "required",
-            "jumlah_bayar"  => "required",
-            "sisa_bayar"    => "required"
-            
-        ]);
+        $validatedData = $request->validate([
+        'tgl_bayar' => 'required|date',
+        'jumlah_bayar' => 'required|numeric',
+        'pinjaman_id' => 'required|exists:pinjamen,id',
+    ]);
 
-        // simpan
-        $hasil = Pembayaran::create($input);
-        if ($hasil) { // jika data berhasil disimpan
-            $response['success'] = true;
-            $response['message'] = $request->nama . " berhasil disimpan";
-            return response()->json($response, 201); // 201 Created
-        } else {
-            $response['success'] = false;
-            $response['message'] = $request->nama . " gagal disimpan";
-            return response()->json($response, 400); // 400 Bad Request
-        }
+    // Ambil data pinjaman terkait
+    $pinjaman = Pinjaman::findOrFail($request->pinjaman_id);
+
+    // Hitung sisa bayar
+    $totalDibayar = Pembayaran::where('pinjaman_id', $pinjaman->id)->sum('jumlah_bayar');
+    $sisaBayar = $pinjaman->jumlah_pinjam - ($totalDibayar + $request->jumlah_bayar);
+
+    // Simpan pembayaran
+    $pembayaran = Pembayaran::create([
+        'tgl_bayar' => $validatedData['tgl_bayar'],
+        'jumlah_bayar' => $validatedData['jumlah_bayar'],
+        'pinjaman_id' => $validatedData['pinjaman_id'],
+        'sisa_bayar' => $sisaBayar,
+    ]);
+
+    return response()->json([
+        'message' => 'Pembayaran berhasil ditambahkan',
+        'data' => $pembayaran
+    ]);
     }
 
     public function updatePembayaran(Request $request, $id)
@@ -141,7 +146,6 @@ public function destroyPembayaran($id)
         $input = $request->validate([
             "tgl_bayar"     => "required",
             "jumlah_bayar"  => "required",
-            "sisa_bayar"   => "required",
             "pinjaman_id"   => "required"
         ]);
 
