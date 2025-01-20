@@ -114,7 +114,7 @@ public function destroyPembayaran($id)
         $validatedData = $request->validate([
         'tgl_bayar' => 'required|date',
         'jumlah_bayar' => 'required|numeric',
-        'pinjaman_id' => 'required|exists:pinjamen,id',
+        'pinjaman_id' => 'required|exists:pinjamen,id'
     ]);
 
     // Ambil data pinjaman terkait
@@ -129,7 +129,7 @@ public function destroyPembayaran($id)
         'tgl_bayar' => $validatedData['tgl_bayar'],
         'jumlah_bayar' => $validatedData['jumlah_bayar'],
         'pinjaman_id' => $validatedData['pinjaman_id'],
-        'sisa_bayar' => $sisaBayar,
+        'sisa_bayar' => $sisaBayar
     ]);
 
     return response()->json([

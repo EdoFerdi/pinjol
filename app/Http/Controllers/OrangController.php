@@ -66,7 +66,7 @@ class OrangController extends Controller
     public function getOrang()
     {
         $response['data'] = Orang::all();
-        $response['message'] = 'List data Orang ';
+        $response['message'] = 'List data Orang';
         $response['success'] = true;
 
         return response()->json($response, 200);
