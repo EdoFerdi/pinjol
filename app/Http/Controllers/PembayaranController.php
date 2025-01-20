@@ -138,30 +138,54 @@ public function destroyPembayaran($id)
     ]);
     }
 
+
     public function updatePembayaran(Request $request, $id)
     {
-        $pembayaran = Pembayaran::find($id);
+        // Cari data pembayaran berdasarkan ID
+        $pembayaran = Pembayaran::findOrFail($id);
 
-        // validasi input
-        $input = $request->validate([
-            "tgl_bayar"     => "required",
-            "jumlah_bayar"  => "required",
-            "pinjaman_id"   => "required"
+        // Validasi input
+        $validatedData = $request->validate([
+            "tgl_bayar"    => "required|date",
+            "jumlah_bayar" => "required|numeric|min:1",
+            "pinjaman_id"  => "required|exists:pinjamen,id"
         ]);
 
-        // simpan
-        $hasil = $pembayaran->update($input);
+        // Ambil data pinjaman terkait
+        $pinjaman = Pinjaman::findOrFail($validatedData['pinjaman_id']);
 
-        if($hasil){ // jika data berhasil disimpan
-            $response['success'] = true;
-            $response['message'] = "Pembayaran berhasil diubah";
-            return response()->json($response, 200);
-        } else {
-            $response['success'] = false;
-            $response['message'] = "Pembayaran gagal diubah";
-            return response()->json($response, 400);
+        // Hitung ulang sisa bayar
+        $totalDibayarSebelumnya = Pembayaran::where('pinjaman_id', $pinjaman->id)
+            ->where('id', '!=', $pembayaran->id) // Exclude pembayaran ini
+            ->sum('jumlah_bayar');
+        $sisaBayar = $pinjaman->jumlah_pinjam - ($totalDibayarSebelumnya + $validatedData['jumlah_bayar']);
+
+        // Cek apakah jumlah bayar melebihi sisa pinjaman
+        if ($sisaBayar < 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jumlah bayar melebihi sisa pinjaman.'
+            ], 400);
         }
 
+        // Update data pembayaran
+        $pembayaran->tgl_bayar = $validatedData['tgl_bayar'];
+        $pembayaran->jumlah_bayar = $validatedData['jumlah_bayar'];
+        $pembayaran->pinjaman_id = $validatedData['pinjaman_id'];
+        $pembayaran->sisa_bayar = $sisaBayar;
+
+        if ($pembayaran->save()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran berhasil diubah',
+                'data' => $pembayaran
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pembayaran gagal diubah'
+            ], 400);
+        }
     }
 
 }
