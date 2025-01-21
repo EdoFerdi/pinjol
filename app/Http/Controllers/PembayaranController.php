@@ -135,7 +135,7 @@ public function destroyPembayaran($id)
     return response()->json([
         'message' => 'Pembayaran berhasil ditambahkan',
         'data' => $pembayaran
-    ]);
+    ], 201);
     }
 
 
